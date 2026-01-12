@@ -1,0 +1,70 @@
+{
+    "timestamp": "2026-01-12 10:46:20",
+    "profile": {
+        "user_id": "KIX796",
+        "name": "Hrishikesh Anand Bhogade",
+        "email": "hrishikeshbhogade42@gmail.com",
+        "broker": "ZERODHA",
+        "products": [
+            "CNC",
+            "NRML",
+            "MIS",
+            "BO",
+            "CO"
+        ],
+        "exchanges": [
+            "NSE",
+            "BSE",
+            "MF"
+        ]
+    },
+    "holdings": [
+        {
+            "symbol": "INFY",
+            "qty": 2.0,
+            "avg": 450.0,
+            "ltp": 1614.1,
+            "pnl": 2328.2
+        },
+        {
+            "symbol": "HDFCBANK",
+            "qty": 3.0,
+            "avg": 1006.0,
+            "ltp": 939.0,
+            "pnl": -201.0
+        },
+        {
+            "symbol": "RELIANCE",
+            "qty": 5.0,
+            "avg": 1156.0,
+            "ltp": 1475.3,
+            "pnl": 1596.5
+        }
+    ],
+    "mutual_funds": [
+        {
+            "scheme_name": "SBI BLUECHIP FUND - DIRECT PLAN - GROWTH",
+            "units": 150.25,
+            "avg_nav": 65.5,
+            "nav": 106.307,
+            "value": 15972.63,
+            "gain_pct": 62.3
+        },
+        {
+            "scheme_name": "ICICI PRUDENTIAL EQUITY & DEBT FUND - DIRECT - GROWTH",
+            "units": 200.5,
+            "avg_nav": 180.25,
+            "nav": 453.09,
+            "value": 90844.54,
+            "gain_pct": 151.37
+        },
+        {
+            "scheme_name": "HDFC MID-CAP OPPORTUNITIES FUND - DIRECT PLAN - GROWTH",
+            "units": 75.125,
+            "avg_nav": 125.8,
+            "nav": 222.322,
+            "value": 16701.94,
+            "gain_pct": 76.73
+        }
+    ]
+}

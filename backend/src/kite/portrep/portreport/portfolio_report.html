@@ -1,0 +1,747 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Portfolio Analysis Report</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #ffffff;
+            font-size: 11pt;
+        }
+        
+        .page {
+            background: white;
+            padding: 20px;
+            page-break-after: always;
+        }
+        
+        .page:last-child {
+            page-break-after: auto;
+        }
+        
+        /* Header Styles */
+        .header {
+            border-bottom: 4px solid #2563eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28pt;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+        }
+        
+        .header .subtitle {
+            font-size: 11pt;
+            color: #64748b;
+        }
+        
+        /* Section Styles */
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            display: table;
+            width: 100%;
+        }
+        
+        .section-title .number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: #2563eb;
+            color: white;
+            border-radius: 6px;
+            text-align: center;
+            line-height: 35px;
+            font-size: 16pt;
+            font-weight: bold;
+            margin-right: 10px;
+            float: left;
+        }
+        
+        .subsection-title {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #334155;
+            margin: 20px 0 12px 0;
+        }
+        
+        /* Profile Card */
+        .profile-card {
+            background: #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            color: white;
+            margin-bottom: 25px;
+        }
+        
+        .profile-grid {
+            display: table;
+            width: 100%;
+        }
+        
+        .profile-item {
+            display: table-cell;
+            width: 50%;
+            padding: 8px;
+            vertical-align: top;
+        }
+        
+        .profile-label {
+            font-size: 9pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+        
+        .profile-value {
+            font-size: 12pt;
+            font-weight: bold;
+        }
+        
+        /* Stats Cards */
+        .stats-container {
+            display: table;
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            display: table-cell;
+            width: 33.33%;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #2563eb;
+            margin: 0 5px;
+        }
+        
+        .stat-card.positive {
+            border-left-color: #10b981;
+        }
+        
+        .stat-card.negative {
+            border-left-color: #ef4444;
+        }
+        
+        .stat-label {
+            font-size: 9pt;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+        
+        .stat-value {
+            font-size: 20pt;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .stat-change {
+            font-size: 11pt;
+            margin-top: 4px;
+            font-weight: bold;
+        }
+        
+        .stat-change.positive {
+            color: #10b981;
+        }
+        
+        .stat-change.negative {
+            color: #ef4444;
+        }
+        
+        /* Tables */
+        .table-container {
+            margin: 15px 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border: 1px solid #e2e8f0;
+        }
+        
+        thead {
+            background: #1e40af;
+            color: white;
+        }
+        
+        th {
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 10pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 10pt;
+        }
+        
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .symbol-cell {
+            font-weight: bold;
+            color: #1e40af;
+            font-size: 11pt;
+        }
+        
+        .positive-value {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .negative-value {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        
+        /* Stock Analysis Card */
+        .stock-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid #2563eb;
+        }
+        
+        .stock-header {
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 15px;
+        }
+        
+        .stock-name {
+            font-size: 16pt;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+        
+        .stock-metrics {
+            display: table;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .metric {
+            display: table-cell;
+            width: 25%;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 0 2px;
+        }
+        
+        .metric-label {
+            font-size: 8pt;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+        
+        .metric-value {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .chart-container {
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        
+        .info-box p {
+            margin-bottom: 8px;
+            color: #1e40af;
+            font-size: 10pt;
+            line-height: 1.6;
+        }
+        
+        .info-box strong {
+            color: #1e3a8a;
+            font-weight: bold;
+        }
+        
+        /* Analysis Container Styles */
+        .analysis-container {
+            margin-top: 15px;
+        }
+        
+        .analysis-section {
+            background: #ffffff;
+            border-left: 4px solid #3b82f6;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .analysis-section-title {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .analysis-icon {
+            font-size: 14pt;
+            margin-right: 8px;
+        }
+        
+        .analysis-content {
+            color: #334155;
+            line-height: 1.7;
+        }
+        
+        .analysis-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        
+        .analysis-list li {
+            padding: 8px 0 8px 25px;
+            position: relative;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 10pt;
+            line-height: 1.6;
+        }
+        
+        .analysis-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .analysis-list li:before {
+            content: "▸";
+            position: absolute;
+            left: 8px;
+            color: #3b82f6;
+            font-weight: bold;
+        }
+        
+        /* Keyword Highlighting */
+        .buy-tag, .accumulate-tag {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        
+        .sell-tag {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        
+        .hold-tag {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        
+        .positive-keyword {
+            color: #059669;
+            font-weight: bold;
+        }
+        
+        .negative-keyword {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+            font-size: 9pt;
+            border-top: 2px solid #e2e8f0;
+            margin-top: 30px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        /* Print specific fixes */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .page {
+                page-break-after: always;
+            }
+            
+            .stock-card, .analysis-section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="header">
+        <h1>Investment Portfolio Analysis Report</h1>
+        <div class="subtitle">Generated on 2025-12-31 20:00:29</div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">
+            <span class="number">1</span>
+            Client Profile & Account Summary
+        </div>
+        <div class="profile-card">
+            <div class="profile-grid">
+    
+                <div class="profile-item">
+                    <div class="profile-label">Client Name</div>
+                    <div class="profile-value">Ganesh Vasant More</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Client ID</div>
+                    <div class="profile-value">EKL002</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Brokerage</div>
+                    <div class="profile-value">ZERODHA</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Email Contact</div>
+                    <div class="profile-value">moreganesh631@gmail.com</div>
+                </div>
+    
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">
+            <span class="number">2</span>
+            Market Sentiment Dashboard
+        </div>
+        <p style="color: #64748b; margin-bottom: 20px;">Current Indian market overview with major indices performance and sentiment analysis.</p>
+    
+        <div class="chart-container">
+            <img src="C:\Users\Ganesh.More\Desktop\GaneshMore\KiteInfi\src\kite\portrep\portreport\viz\charts\market_sentiment_dashboard.png" alt="Market Sentiment Dashboard">
+        </div>
+        
+        <div class="info-box">
+            <p><strong>Top Left - Major Indices Performance:</strong> Shows percentage change for key Indian indices (NIFTY 50, SENSEX, BANKNIFTY, etc.) over the selected period.</p>
+            <p><strong>Top Right - NIFTY 50 vs India VIX:</strong> Displays the inverse relationship between market performance and volatility. Higher VIX indicates increased market fear.</p>
+            <p><strong>Bottom Left - Relative Performance:</strong> Compares normalized performance of different indices from a common starting point (100).</p>
+            <p><strong>Bottom Right - Fear & Greed Index:</strong> Market sentiment gauge based on India VIX. Extreme Fear (&lt;25) suggests buying opportunity, Extreme Greed (&gt;75) suggests caution.</p>
+        </div>
+    </div>
+    </div><div class="page">
+    <div class="section">
+        <div class="section-title">
+            <span class="number">3</span>
+            Portfolio Performance Overview
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-label">Total Investment</div>
+                <div class="stat-value">₹304.14</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Current Value</div>
+                <div class="stat-value">₹323.08</div>
+            </div>
+            <div class="stat-card positive">
+                <div class="stat-label">Total P&L</div>
+                <div class="stat-value">₹18.94</div>
+                <div class="stat-change positive">+6.23%</div>
+            </div>
+        </div>
+    
+        <div class="subsection-title">Portfolio Performance Chart</div>
+        <p style="color: #64748b; margin-bottom: 15px;">Year-to-date performance tracking of your equity holdings with benchmark comparison.</p>
+        <div class="chart-container">
+            <img src="C:\Users\Ganesh.More\Desktop\GaneshMore\KiteInfi\src\kite\portrep\portreport\viz\charts\portfolio_performance_tracker.png" alt="Portfolio Performance Tracker">
+        </div>
+        
+        <div class="subsection-title">Holdings Summary</div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Quantity</th>
+                        <th>Avg. Cost</th>
+                        <th>Current Price</th>
+                        <th>Net P&L</th>
+                    </tr>
+                </thead>
+                <tbody>
+    
+                    <tr>
+                        <td class="symbol-cell">ADANIPOWER</td>
+                        <td>1.0</td>
+                        <td>₹142.27</td>
+                        <td>₹143.00</td>
+                        <td class="positive-value">₹0.73</td>
+                    </tr>
+        
+                    <tr>
+                        <td class="symbol-cell">TATASTEEL</td>
+                        <td>1.0</td>
+                        <td>₹161.87</td>
+                        <td>₹180.08</td>
+                        <td class="positive-value">₹18.21</td>
+                    </tr>
+        
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div><div class="page">
+        <div class="section">
+            <div class="section-title">
+                <span class="number">4.1</span>
+                ADANIPOWER - Detailed Analysis
+            </div>
+            
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-name">ADANIPOWER</div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Position</div>
+                        <div class="metric-value">1.0 shares</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Avg. Cost</div>
+                        <div class="metric-value">₹142.27</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Current Price</div>
+                        <div class="metric-value">₹143.00</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Net P&L</div>
+                        <div class="metric-value positive-value">₹0.73</div>
+                    </div>
+                </div>
+        
+                <div class="chart-container">
+                    <img src="C:\Users\Ganesh.More\Desktop\GaneshMore\KiteInfi\src\kite\portrep\portreport\viz\charts\stock_analysis_ADANIPOWER.png" alt="ADANIPOWER Technical Analysis">
+                </div>
+            
+                <div class="subsection-title">Research & Analysis</div>
+                <div class="analysis-box"><p style="color: #64748b; font-style: italic;">Error generating analysis: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01jzmzqah0f5rs9e925djy3h1z` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99836, Requested 824. Please try again in 9m30.24s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}</p></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <span class="number">4.2</span>
+                TATASTEEL - Detailed Analysis
+            </div>
+            
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-name">TATASTEEL</div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Position</div>
+                        <div class="metric-value">1.0 shares</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Avg. Cost</div>
+                        <div class="metric-value">₹161.87</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Current Price</div>
+                        <div class="metric-value">₹180.08</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Net P&L</div>
+                        <div class="metric-value positive-value">₹18.21</div>
+                    </div>
+                </div>
+        
+                <div class="chart-container">
+                    <img src="C:\Users\Ganesh.More\Desktop\GaneshMore\KiteInfi\src\kite\portrep\portreport\viz\charts\stock_analysis_TATASTEEL.png" alt="TATASTEEL Technical Analysis">
+                </div>
+            
+                <div class="subsection-title">Research & Analysis</div>
+                <div class="analysis-box"><p style="color: #64748b; font-style: italic;">Error generating analysis: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01jzmzqah0f5rs9e925djy3h1z` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99833, Requested 700. Please try again in 7m40.511999999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}</p></div>
+            </div>
+        </div>
+        </div><div class="page">
+    <div class="section">
+        <div class="section-title">
+            <span class="number">5</span>
+            Mutual Fund Portfolio Analysis
+        </div>
+    
+            <div class="subsection-title">Performance Overview</div>
+            <div class="chart-container">
+                <img src="C:\Users\Ganesh.More\Desktop\GaneshMore\KiteInfi\src\kite\portrep\portreport\viz\charts\mf_performance_overview.png" alt="Mutual Fund Performance Overview">
+            </div>
+            <div class="subsection-title">Detailed Fund Analysis</div>
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-name">MOTILAL OSWAL MIDCAP FUND - DIRECT PLAN</div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Units</div>
+                        <div class="metric-value">104.98</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">NAV</div>
+                        <div class="metric-value">₹113.91</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Market Value</div>
+                        <div class="metric-value">₹11,958.94</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Gain</div>
+                        <div class="metric-value negative-value">-0.34%</div>
+                    </div>
+                </div>
+                
+                <div class="analysis-box"><p style="color: #64748b; font-style: italic;">Error generating analysis: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01jzmzqah0f5rs9e925djy3h1z` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99832, Requested 856. Please try again in 9m54.432s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}</p></div>
+            </div>
+            
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-name">MOTILAL OSWAL LARGE CAP FUND - DIRECT PLAN</div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Units</div>
+                        <div class="metric-value">877.26</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">NAV</div>
+                        <div class="metric-value">₹14.60</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Market Value</div>
+                        <div class="metric-value">₹12,804.60</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Gain</div>
+                        <div class="metric-value positive-value">6.71%</div>
+                    </div>
+                </div>
+                
+                <div class="analysis-box"><p style="color: #64748b; font-style: italic;">Error generating analysis: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01jzmzqah0f5rs9e925djy3h1z` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99830, Requested 843. Please try again in 9m41.472s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}</p></div>
+            </div>
+            
+            <div class="stock-card">
+                <div class="stock-header">
+                    <div class="stock-name">MOTILAL OSWAL SMALL CAP FUND - DIRECT PLAN</div>
+                </div>
+                
+                <div class="stock-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Units</div>
+                        <div class="metric-value">871.05</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">NAV</div>
+                        <div class="metric-value">₹14.35</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Market Value</div>
+                        <div class="metric-value">₹12,498.46</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Gain</div>
+                        <div class="metric-value positive-value">4.16%</div>
+                    </div>
+                </div>
+                
+                <div class="analysis-box"><p style="color: #64748b; font-style: italic;">Error generating analysis: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01jzmzqah0f5rs9e925djy3h1z` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99828, Requested 1058. Please try again in 12m45.504s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}</p></div>
+            </div>
+            
+    </div>
+    
+    <div class="footer">
+        <p>This report is generated automatically and is for informational purposes only.</p>
+        <p>Past performance does not guarantee future results. Please consult with a financial advisor before making investment decisions.</p>
+    </div>
+    </div>
+</body>
+</html>

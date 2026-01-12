@@ -1,0 +1,64 @@
+{
+    "timestamp": "2025-12-31 20:00:29",
+    "profile": {
+        "user_id": "EKL002",
+        "name": "Ganesh Vasant More",
+        "email": "moreganesh631@gmail.com",
+        "broker": "ZERODHA",
+        "products": [
+            "CNC",
+            "NRML",
+            "MIS",
+            "BO",
+            "CO"
+        ],
+        "exchanges": [
+            "NSE",
+            "BSE",
+            "MF",
+            "NFO"
+        ]
+    },
+    "holdings": [
+        {
+            "symbol": "ADANIPOWER",
+            "qty": 1.0,
+            "avg": 142.27,
+            "ltp": 143.0,
+            "pnl": 0.73
+        },
+        {
+            "symbol": "TATASTEEL",
+            "qty": 1.0,
+            "avg": 161.87,
+            "ltp": 180.08,
+            "pnl": 18.21
+        }
+    ],
+    "mutual_funds": [
+        {
+            "scheme_name": "MOTILAL OSWAL MIDCAP FUND - DIRECT PLAN",
+            "units": 104.984,
+            "avg_nav": 114.2952,
+            "nav": 113.912,
+            "value": 11958.94,
+            "gain_pct": -0.34
+        },
+        {
+            "scheme_name": "MOTILAL OSWAL LARGE CAP FUND - DIRECT PLAN",
+            "units": 877.256,
+            "avg_nav": 13.6783,
+            "nav": 14.5962,
+            "value": 12804.6,
+            "gain_pct": 6.71
+        },
+        {
+            "scheme_name": "MOTILAL OSWAL SMALL CAP FUND - DIRECT PLAN",
+            "units": 871.046,
+            "avg_nav": 13.7758,
+            "nav": 14.3488,
+            "value": 12498.46,
+            "gain_pct": 4.16
+        }
+    ]
+}

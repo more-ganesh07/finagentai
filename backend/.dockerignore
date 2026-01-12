@@ -1,0 +1,42 @@
+# Python Virtual Environment
+finenv/
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Your specific directories that shouldn't be in Docker
+.cache/
+
+# Environment files (secrets should be passed via Render env vars)
+.env
+
+# Logs (generated at runtime)
+*.log
+stock_analysis.log
+
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker files (no need to copy these into the image)
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+
+# Documentation
+README.md
+*.md
