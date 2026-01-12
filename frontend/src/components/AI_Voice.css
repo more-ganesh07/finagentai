@@ -1,0 +1,271 @@
+:root {
+  --ai-voice-size: 40px;
+  --ai-voice-ink: rgba(0, 0, 0, 0.9);
+  --ai-voice-muted: rgba(0, 0, 0, 0.35);
+  --tooltip-bg: #cc6b00;
+  --tooltip-fg: #fff;
+
+  /* Theme variables defaults */
+  --ai-voice-color: #ff7a18;
+  --ai-voice-hover-bg: rgba(255, 122, 24, 0.1);
+  --ai-voice-active-color: #ff453a;
+  --ai-voice-active-bg: rgba(255, 69, 58, 0.1);
+  --ai-voice-wave-color: #ff453a;
+}
+
+/* compact mic button */
+.ai-voice-btn {
+  width: var(--ai-voice-size);
+  height: var(--ai-voice-size);
+  border-radius: 50%;
+  /* Circular button */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  /* Transparent bg */
+  border: 1.5px solid var(--ai-voice-color);
+  /* Orange border */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  position: relative;
+  z-index: 2;
+  /* Above waves */
+  box-shadow: none;
+}
+
+.ai-voice-btn:hover {
+  background: var(--ai-voice-hover-bg);
+  border-color: var(--ai-voice-color);
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.ai-voice-btn:active {
+  transform: scale(0.96);
+}
+
+.mic-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--ai-voice-color);
+  /* Default to white-ish icon to match border */
+  transition: color 0.2s;
+}
+
+/* Active listening state */
+.ai-voice-btn--listening {
+  background: var(--ai-voice-active-bg);
+  border-color: var(--ai-voice-active-color);
+  box-shadow: 0 0 0 2px var(--ai-voice-active-bg);
+}
+
+.ai-voice-btn--listening .mic-icon {
+  color: var(--ai-voice-active-color);
+  animation: mic-pulse 1.5s infinite;
+}
+
+.ai-voice-btn--countdown {
+  cursor: wait;
+}
+
+.countdown-text {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--ai-voice-color);
+  animation: countdown-pulse 1s infinite;
+}
+
+@keyframes countdown-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes mic-pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Waves container */
+.ai-voice-waves {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  /* Behind button */
+}
+
+/* Individual wave */
+.ai-voice-wave {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid var(--ai-voice-wave-color);
+  opacity: 0;
+  animation: wave-expand 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-voice-wave:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+.ai-voice-wave:nth-child(3) {
+  animation-delay: 1.2s;
+}
+
+@keyframes wave-expand {
+  0% {
+    width: 100%;
+    height: 100%;
+    opacity: 0.8;
+    border-width: 2px;
+  }
+
+  100% {
+    width: 300%;
+    /* Expand further */
+    height: 300%;
+    opacity: 0;
+    border-width: 0px;
+  }
+}
+
+/* disabled visual state */
+.ai-voice-btn--disabled {
+  opacity: 0.4;
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.ai-voice-btn--disabled:hover {
+  background: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
+/* tooltip wrapper */
+/* Uses data-tooltip attr — appears on hover when non-empty */
+.ai-voice-tooltip {
+  position: relative;
+  display: inline-flex;
+  /* Ensure correct positioning of valid layout */
+  align-items: center;
+  justify-content: center;
+}
+
+/* tooltip styling (hidden by default) */
+.ai-voice-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-fg);
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  z-index: 50;
+}
+
+/* small arrow */
+.ai-voice-tooltip::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: var(--tooltip-bg);
+  transform-origin: center;
+  clip-path: polygon(50% 0, 0 100%, 100% 100%);
+  opacity: 0;
+  transition: opacity 160ms ease;
+  z-index: 50;
+}
+
+/* show tooltip only when data-tooltip is non-empty and hovered */
+.ai-voice-tooltip:hover::after,
+.ai-voice-tooltip:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* accessibility: reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .ai-voice-tooltip::after,
+  .ai-voice-tooltip::before,
+  .mic-icon,
+  .ai-voice-wave {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* dark theme tweaks */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ai-voice-ink: rgba(255, 255, 255, 0.9);
+    --ai-voice-muted: rgba(255, 255, 255, 0.75);
+    --tooltip-bg: #cc6b00;
+  }
+
+  /* In dark mode, since button is white, use orange or dark gray for icon */
+  .mic-icon {
+    color: var(--ai-voice-color);
+  }
+
+  .ai-voice-btn--listening .mic-icon {
+    color: var(--ai-voice-active-color);
+  }
+
+  /* Ensure button isn't too bright or provide dark mode alternative */
+  /* For "white circle" request, we keep it white or light grey even in dark mode */
+  .ai-voice-btn {
+    border-color: var(--ai-voice-color);
+  }
+
+  .ai-voice-btn:hover {
+    border-color: var(--ai-voice-color);
+    background: var(--ai-voice-hover-bg);
+  }
+}

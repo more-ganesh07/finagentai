@@ -1,0 +1,111 @@
+/* GridBackground CSS */
+
+/* wrapper: full-size background layer */
+.grid-bg-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  background: var(--grid-bg, var(--bg));
+  overflow: hidden;
+}
+
+/* grid layer sits behind content */
+.grid-bg-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.12; /* subtle grid */
+}
+
+/* each cell (borders handled inline) */
+.grid-bg-cell {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* beams common style */
+.grid-beam {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+  border-radius: 999px;
+  background: var(--beam-color, #60a5fa);
+  filter: blur(0.6px);
+  box-shadow: var(--beam-shadow, 0 6px 20px rgba(0,0,0,0.4));
+  opacity: 0;
+  /* animation parameters supplied inline via CSS vars */
+  animation-name: beamOpacity, beamTravelX;
+  animation-duration: var(--beam-duration, 6s);
+  animation-delay: var(--beam-delay, 0s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: forwards;
+}
+
+/* horizontal beam sizes & animation use translateX */
+.grid-beam.beam-h {
+  width: calc(var(--beam-size, 8px) * 12); /* long thin rectangle */
+  height: var(--beam-size, 8px);
+  transform-origin: left center;
+  border-radius: 999px;
+  /* override travel animation to X */
+  animation-name: beamOpacity, beamTravelX;
+}
+
+/* vertical beams */
+.grid-beam.beam-v {
+  width: var(--beam-size, 8px);
+  height: calc(var(--beam-size, 8px) * 12);
+  transform-origin: top center;
+  border-radius: 999px;
+  animation-name: beamOpacity, beamTravelY;
+}
+
+/* opacity pulse: quick fade in, hold, fade out */
+@keyframes beamOpacity {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* travel across X: translateX by calc(var(--beam-dir) * var(--beam-distance)) */
+@keyframes beamTravelX {
+  0% { transform: translateY(-50%) translateX(0); }
+  100% { transform: translateY(-50%) translateX(calc(var(--beam-dir) * var(--beam-distance))); }
+}
+
+/* travel across Y */
+@keyframes beamTravelY {
+  0% { transform: translateX(-50%) translateY(0); }
+  100% { transform: translateX(-50%) translateY(calc(var(--beam-dir) * var(--beam-distance))); }
+}
+
+/* content layer sits above grid+beams */
+.grid-bg-content {
+  position: relative;
+  z-index: 30;
+  width: 100%;
+  min-height: 100%;
+}
+
+/* small visual tweaks */
+.grid-beam::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.25), rgba(255,255,255,0.03));
+  mix-blend-mode: screen;
+  opacity: 0.4;
+  border-radius: inherit;
+}
+
+/* responsiveness: on tiny screens reduce beam count opacity*/
+@media (max-width: 640px) {
+  .grid-bg-grid { opacity: 0.08; }
+  .grid-beam { opacity: 0.9; filter: blur(1px); }
+}

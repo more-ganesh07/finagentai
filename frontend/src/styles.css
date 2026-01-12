@@ -1,0 +1,2350 @@
+/* ============================================================
+   THEME VARIABLES (single place for all CSS variables)
+   ============================================================ */
+:root {
+  /* core palette adjusted for dark theme */
+  --bg: #0b1220;
+  /* deep almost-black navy (page background) */
+  --card: #0f1a27;
+  /* dark card/panel surface (replaces green) */
+  --brand: #22323f;
+  /* muted brand base */
+  --brand-2: #1b2933;
+  /* brand gradient second color */
+
+  --ink: #e8eefc;
+  /* light text */
+  --muted: #8f9fb6;
+  --ok: #8ecae6;
+  --danger: #ef476f;
+
+  /* new accent for hover border */
+  --accent-orange: #ff7a18;
+
+  --radius: 14px;
+  --topnav-h: 56px;
+  /* navbar height */
+
+  /* chat scrollbar colors */
+  --scrollbar: rgba(255, 255, 255, .12);
+  --scrollbar-hover: rgba(255, 255, 255, .22);
+
+  /* login button */
+  --primary-blue: #3b82f6;
+
+  /* Lottie offsets / floats */
+  --lottie-shift-x: 2vw;
+  /* move right  */
+  --lottie-shift-y: -48px;
+  /* move up     */
+  --lottie-x: 2vw;
+  /* used in keyframes */
+  --lottie-y: -120px;
+  /* used in keyframes */
+}
+
+/* ============================================================
+   GLOBAL SCROLLBAR STYLES
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+/* ============================================================
+   RESET & BASE TYPOGRAPHY / BODY
+   ============================================================ */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* anchor defaults */
+a {
+  color: var(--ok);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ensure dark page background is consistent */
+body {
+  background-color: var(--bg);
+}
+
+/* ============================================================
+   FORM CONTROLS: buttons, inputs, selects, textareas
+   ============================================================ */
+.button {
+  background: linear-gradient(180deg, var(--brand-2), var(--brand));
+  color: var(--ink);
+  border: 0;
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .05s ease, box-shadow .15s ease;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(255, 255, 255, .03);
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, .04);
+  color: var(--ink);
+  border-radius: 10px;
+  outline: none;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--ok);
+}
+
+/* login / logout button styles */
+.btn-login {
+  background: transparent;
+  border: 1px solid color-mix(in oklab, var(--accent-orange) 85%, white 0%);
+  color: color-mix(in oklab, var(--accent-orange) 92%, white 0%);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, transform .05s ease, border-color .15s ease;
+}
+
+.btn-login:hover {
+  background: var(--accent-orange);
+  color: #fff;
+  border-color: var(--accent-orange);
+}
+
+.btn-login:active {
+  transform: translateY(1px);
+}
+
+.btn-logout {
+  background: rgba(239, 71, 111, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  padding: 8px 14px;
+  min-width: 48px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(239, 71, 111, 0.06), 0 2px 6px rgba(255, 255, 255, 0.04);
+  transition: transform .05s ease, box-shadow .15s ease, background .12s ease, border-color .12s ease;
+}
+
+.btn-logout:hover {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(239, 71, 111, 0.12);
+}
+
+.btn-logout:hover svg {
+  stroke: white;
+  /* high contrast */
+}
+
+.btn-logout:active {
+  transform: translateY(0);
+}
+
+.btn-logout:focus-visible {
+  outline: 3px solid rgba(239, 71, 111, 0.12);
+  outline-offset: 2px;
+}
+
+/* toggle small variant */
+.toggle.tiny {
+  padding: 0;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.toggle.tiny:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 122, 24, 0.4);
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.toggle.tiny:active {
+  transform: scale(0.95);
+}
+
+/* ============================================================
+   LAYOUT: app shell, topnav, main area, header, content
+   ============================================================ */
+
+/* app shell base layout */
+.app-shell {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: calc(100vh - var(--topnav-h));
+  /* account for top navbar */
+  height: auto;
+  transition: grid-template-columns 0.3s ease, box-shadow .22s cubic-bezier(.2, .9, .2, 1), transform .16s ease;
+  border-radius: calc(var(--radius) + 2px);
+  background: transparent;
+}
+
+/* NOTE: removed the old global .app-shell:hover orange inset to avoid
+   the accent appearing when you hover the chat window.
+   Instead we apply accent only on .topnav and .sidebar hover/focus. */
+
+.app-shell.collapsed {
+  grid-template-columns: 72px 1fr;
+}
+
+/* Top navbar */
+.topnav {
+  height: var(--topnav-h);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: linear-gradient(180deg, var(--brand-2), var(--brand));
+  border-bottom: 1px solid rgba(255, 255, 255, .04);
+  backdrop-filter: blur(6px);
+  transition: background .18s ease, border-color .18s ease, box-shadow .18s ease, transform .12s ease;
+}
+
+.topnav__left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topnav__brand {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 900;
+  letter-spacing: .4px;
+  font-size: 16.5px;
+  text-decoration: none !important;
+  color: var(--ink);
+}
+
+/* -----------------------------------------
+   TOPNAV LINKS — ORANGE UNDERLINE ON HOVER
+   ----------------------------------------- */
+
+.topnav__links {
+  position: relative;
+  display: flex;
+  gap: 6px;
+}
+
+/* Base link styling (unchanged) */
+.topnav__links a {
+  position: relative;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: color .2s ease, opacity .2s ease;
+}
+
+/* The animated orange underline */
+.topnav__links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+
+  /* underline anchored to bottom of NAVBAR */
+  bottom: -10px;
+
+  height: 3px;
+  background-color: var(--accent-orange);
+  border-radius: 2px;
+
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .22s ease, opacity .22s ease;
+}
+
+/* On hover or focus, reveal the underline */
+.topnav__links a:hover::after,
+.topnav__links a:focus-visible::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* Active page underline always shown */
+.topnav__links a.active::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.brand-dim {
+  background: linear-gradient(90deg,
+      color-mix(in srgb, var(--accent-orange) 40%, white 40%),
+      color-mix(in srgb, var(--accent-orange) 60%, white 20%));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.brand-glow {
+  background: linear-gradient(90deg,
+      var(--accent-orange),
+      #ff8e3d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 8px rgba(255, 122, 24, 0.18);
+}
+
+.topnav__right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Topnav accent (only on hovering/focusing the topnav itself) */
+.topnav:hover,
+.topnav:focus-within {
+  /* transform: translateY(-1px); */
+  box-shadow:
+    0 6px 26px rgba(0, 0, 0, .35),
+    0 0 0 3px rgba(255, 122, 24, 0.08),
+    inset 0 0 0 1px rgba(255, 122, 24, 0.06);
+  border-bottom-color: rgba(255, 122, 24, 0.10);
+}
+
+/* Main content grid */
+.main {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  /* header + content */
+  min-width: 0;
+  min-height: 0;
+  /* enable inner scroll */
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, .04);
+  background: var(--card);
+}
+
+.header .mini {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.content {
+  padding: 18px;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  /* messages grow, input sticks */
+  gap: 12px;
+  overflow: hidden;
+  /* keep scroll local */
+  min-height: 0;
+  /* allow child to scroll */
+}
+
+/* ============================================================
+   SIDEBAR: layout, collapsed behavior, nav items, user chip
+   ============================================================ */
+.sidebar {
+  display: grid !important;
+  grid-template-rows: auto 1fr auto !important;
+  align-content: stretch;
+  gap: 10px;
+  padding: 12px;
+  transition: width 0.3s ease, padding 0.3s ease, background-color 0.3s ease, box-shadow .2s ease, border-color .2s ease;
+  width: 280px;
+  /* default open width */
+  overflow: hidden;
+
+  /* new darker surface */
+  background: linear-gradient(180deg, rgba(20, 28, 38, 0.6), rgba(10, 14, 20, 0.65));
+  border-right: 1px solid rgba(255, 255, 255, .03);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .45);
+  border-radius: 12px;
+}
+
+/* Sidebar accent (only when hovering/focusing the sidebar) */
+.sidebar:hover,
+.sidebar:focus-within {
+  box-shadow:
+    0 10px 36px rgba(0, 0, 0, .55),
+    inset 0 0 0 1.5px rgba(255, 122, 24, 0.10);
+  border-right-color: rgba(255, 122, 24, 0.08);
+}
+
+.app-shell.collapsed .sidebar {
+  width: 72px;
+}
+
+.app-shell.collapsed {
+  grid-template-columns: auto 1fr;
+}
+
+/* brand row / compact */
+.brand-row.small {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.brand-row.small {
+  gap: 8px;
+}
+
+/* nav compact styling (single-line items) */
+.nav.compact {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  flex-grow: 1;
+  gap: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-section-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  margin: 12px 0 4px 12px;
+  font-weight: 700;
+  opacity: 0.7;
+}
+
+.sidebar.collapsed .nav-section-title {
+  display: none;
+}
+
+.nav.compact a {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 10px !important;
+  border-radius: 10px !important;
+  line-height: 1 !important;
+  font-size: 12.5px !important;
+  border: 1px solid transparent !important;
+  color: var(--ink) !important;
+  text-decoration: none !important;
+  background: transparent !important;
+}
+
+.nav.compact a:hover,
+.nav.compact a.active {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-color: rgba(255, 255, 255, .04) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .45);
+}
+
+.nav.compact .nav-item svg {
+  flex: 0 0 18px;
+  opacity: .95;
+}
+
+/* prevent nav text wrapping */
+.nav.compact .nav-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* logo chip */
+.logo-chip {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: .3px;
+  background: linear-gradient(180deg, #2b3a50, #182230);
+  color: #eaf1ff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .02), 0 4px 14px rgba(0, 0, 0, .2);
+}
+
+/* user row pinned to bottom */
+.sidebar-user {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, .03);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.sidebar-user.small {
+  padding: 8px;
+  gap: 8px;
+}
+
+/* compact variant */
+
+.sidebar-avatar {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .4px;
+  color: #fff;
+  background: radial-gradient(60% 60% at 40% 35%, #0e1624 0%, #07101a 100%);
+  border: 1px solid rgba(255, 255, 255, .06);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .5);
+}
+
+.sidebar-avatar.tiny {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  font-size: 11px;
+}
+
+.sidebar-identity {
+  line-height: 1.1;
+}
+
+.sidebar-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.sidebar-meta {
+  display: none;
+}
+
+/* collapsed state specifics & tooltips */
+.sidebar.collapsed .brand-row.small {
+  justify-content: center;
+}
+
+.sidebar.collapsed .nav-item span {
+  display: none;
+}
+
+/* hide labels */
+.sidebar.collapsed .sidebar-identity {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-user {
+  justify-content: center;
+  padding: 6px;
+}
+
+.sidebar.collapsed .ticker-card {
+  opacity: 0;
+  transform: scale(0.95);
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sidebar.collapsed .ticker-card {
+  text-align: center;
+  padding: 8px;
+}
+
+/* tooltips for icons when collapsed */
+.sidebar.collapsed .nav-item {
+  position: relative;
+}
+
+.sidebar.collapsed .nav-item::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(10, 16, 32, .96);
+  color: var(--ink);
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, .06);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s ease, transform .12s ease;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .32);
+}
+
+.sidebar.collapsed .nav-item:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(2px);
+}
+
+.sidebar.collapsed .nav-item::before {
+  content: "";
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-right-color: rgba(10, 16, 32, .96);
+  opacity: 0;
+  transition: opacity .12s ease;
+}
+
+.sidebar.collapsed .nav-item:hover::before {
+  opacity: 1;
+}
+
+/* transitions for fade in/out when collapsing */
+.nav-item span,
+.sidebar-name,
+.ticker-card {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.sidebar.collapsed .nav-item span,
+.sidebar.collapsed .sidebar-name,
+.sidebar.collapsed .ticker-card {
+  opacity: 0;
+  transform: translateX(-8px);
+}
+
+.sidebar:not(.collapsed) .nav-item span,
+.sidebar:not(.collapsed) .sidebar-name,
+.sidebar:not(.collapsed) .ticker-card {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ============================================================
+   CHAT AREA: scroll container, rows, avatars, bubbles
+   ============================================================ */
+.chat-scroll {
+  overflow-y: auto;
+  /* ONLY messages scroll */
+  overflow-x: hidden;
+  border-radius: var(--radius);
+  padding: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, .03);
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  /* critical for scroll */
+
+  /* Firefox scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar) transparent;
+}
+
+.chat-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: var(--scrollbar);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.chat-scroll:hover::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-hover);
+}
+
+/* row alignment */
+.chat-row {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  gap: 10px;
+}
+
+.chat-row.user {
+  justify-content: flex-end;
+}
+
+.chat-row.bot {
+  justify-content: flex-start;
+}
+
+/* avatars */
+.avatar {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .4px;
+  user-select: none;
+  border: 1px solid rgba(255, 255, 255, .06);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .25);
+}
+
+.avatar.bot {
+  background: radial-gradient(60% 60% at 40% 35%, #0f1a33 0%, #0a1227 100%);
+  color: #cfe7ff;
+}
+
+.avatar.user {
+  background: radial-gradient(60% 60% at 40% 35%, #1a2542 0%, #132038 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, .06);
+}
+
+/* bubble */
+.bubble {
+  max-width: 92ch;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, .04);
+  background: var(--card);
+
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.bubble.user {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, .06);
+}
+
+.bubble.bot {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, .04);
+}
+
+/* small alignment nudges */
+.chat-row.user .bubble {
+  margin-right: 2px;
+}
+
+.chat-row.bot .bubble {
+  margin-left: 2px;
+}
+
+/* ============================================================
+   FOOTER / INPUT AREA (pinned inside .content)
+   ============================================================ */
+.footer {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, .03);
+  border-radius: 12px;
+  display: grid;
+  gap: 10px;
+  position: sticky;
+  bottom: 0;
+}
+
+.grid-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+
+/* ============================================================
+   MARKDOWN / RICH CONTENT STYLES (inside bot bubble)
+   ============================================================ */
+.md-bubble {
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.md-bubble h1,
+.md-bubble h2,
+.md-bubble h3 {
+  margin: .2em 0 .4em;
+  font-weight: 800;
+}
+
+.md-bubble h1 {
+  font-size: 1.25rem;
+}
+
+.md-bubble h2 {
+  font-size: 1.1rem;
+}
+
+.md-bubble h3 {
+  font-size: 1rem;
+}
+
+.md-bubble p {
+  margin: .4em 0;
+  color: var(--ink);
+}
+
+.md-bubble ul,
+.md-bubble ol {
+  margin: .4em 0 .6em 1.25em;
+}
+
+.md-bubble li {
+  margin: .2em 0;
+}
+
+.md-bubble blockquote {
+  margin: .5em 0;
+  padding: .4em .8em;
+  border-left: 3px solid rgba(255, 255, 255, .06);
+  background: rgba(255, 255, 255, .02);
+  border-radius: 8px;
+}
+
+.md-inline-code {
+  background: rgba(255, 255, 255, .03);
+  padding: .12em .35em;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.92em;
+}
+
+.md-codeblock {
+  background: #07101a;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, .04);
+  overflow-x: auto;
+  margin: .5em 0;
+}
+
+.md-codeblock code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: .92em;
+}
+
+/* tables */
+.md-table-wrap {
+  overflow-x: auto;
+}
+
+.md-bubble table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 320px;
+}
+
+.md-bubble th,
+.md-bubble td {
+  border: 1px solid rgba(255, 255, 255, .06);
+  padding: 6px 8px;
+}
+
+.md-bubble th {
+  background: rgba(255, 255, 255, .03);
+  text-align: left;
+}
+
+/* ============================================================
+   HERO / LANDING / LOTTIE: hero title + pill + free-floating lottie
+   ============================================================ */
+.hero-title {
+  margin: 0 0 16px;
+  font-weight: 900;
+  font-size: clamp(36px, 6vw, 64px);
+  letter-spacing: .3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: center;
+}
+
+.hero-dim {
+  color: rgba(232, 238, 252, .75);
+}
+
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-radius: 16px;
+  background: #5c3df500;
+  color: #ffffff;
+  font-weight: 900;
+  line-height: 1;
+  /* border: 1px solid rgba(252, 150, 82, 0.04); */
+  /* box-shadow: 0 10px 30px rgba(91,61,245,.12); */
+  overflow: hidden;
+}
+
+.hero-pill-split {
+  overflow: hidden;
+  padding-bottom: 2px;
+}
+
+/* use this if the rotating text element is inline inside .hero-title/.hero-pill */
+.text-rotate,
+.hero-title .text-rotate {
+  background: linear-gradient(90deg, var(--accent-orange), #f4a369);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-sub {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: clamp(14px, 1.6vw, 16px);
+}
+
+.hero-title {
+  font-size: clamp(26px, 3.9vw, 42px);
+  line-height: 1.05;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hero-pill {
+  font-size: 0.95em;
+  padding: 5px 6px;
+  border-radius: 12px;
+  box-shadow: 0 8px 22px rgba(91, 61, 245, .10);
+}
+
+.hero-lead {
+  font-size: clamp(13px, 1.4vw, 16px);
+  opacity: .82;
+}
+
+@media (max-width: 900px) {
+  .hero-title {
+    font-size: clamp(22px, 4.4vw, 34px);
+  }
+
+  .hero-pill {
+    padding: 5px 10px;
+    border-radius: 10px;
+  }
+}
+
+@media (min-width: 620px) {
+  .hero-title {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .hero-pill {
+    transform: scale(.94);
+  }
+}
+
+/* nudges the whole hero a little down while keeping it centered */
+.landing-grid {
+  /* existing props retained */
+  width: min(1120px, 94vw);
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 24px;
+  align-items: center;
+  overflow: visible;
+  margin: 0 auto;
+
+  /* new: nudge down slightly */
+  transform: translateY(6vh);
+  transition: transform 280ms ease;
+}
+
+/* reduce nudge on small screens so it doesn't look odd */
+@media (max-width: 980px) {
+  .landing-grid {
+    transform: translateY(3.5vh);
+  }
+}
+
+
+/* lottie free-floating card */
+.lottie-free {
+  height: clamp(280px, 48vh, 520px);
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  animation: lottie-float 6s ease-in-out infinite;
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, .45)) drop-shadow(0 3px 18px rgba(142, 202, 230, .06));
+  place-self: start end;
+  justify-self: end;
+  align-self: start;
+  transform: translate(var(--lottie-shift-x), var(--lottie-shift-y));
+}
+
+@keyframes lottie-float {
+  0% {
+    transform: translate(var(--lottie-x), var(--lottie-y)) rotateX(0.5deg) rotateY(-1deg);
+  }
+
+  50% {
+    transform: translate(var(--lottie-x), calc(var(--lottie-y) - 8px)) rotateX(1.2deg) rotateY(1.2deg);
+  }
+
+  100% {
+    transform: translate(var(--lottie-x), var(--lottie-y)) rotateX(0.5deg) rotateY(-1deg);
+  }
+}
+
+@media (hover: hover) {
+  .lottie-free:hover {
+    animation-play-state: paused;
+    transform: translate(var(--lottie-x), var(--lottie-y)) rotateX(1.5deg) rotateY(2deg);
+    filter: drop-shadow(0 16px 36px rgba(0, 0, 0, .5)) drop-shadow(0 4px 22px rgba(142, 202, 230, .06));
+  }
+}
+
+@media (max-width: 1200px) {
+  :root {
+    --lottie-shift-x: 1vw;
+    --lottie-shift-y: -36px;
+    --lottie-x: 1vw;
+    --lottie-y: -100px;
+  }
+}
+
+@media (max-width: 980px) {
+  .landing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lottie-free {
+    height: clamp(220px, 36vh, 420px);
+    place-self: center;
+    transform: translate(0, 0);
+    animation: none;
+  }
+}
+
+/* ============================================================
+   SIDEBAR MINI MARKET TICKER (compact widget)
+   ============================================================ */
+.ticker-card {
+  margin-top: 6px;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 143, 45, 0.182);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.ticker-card:hover {
+  border: 1px solid rgba(255, 143, 45, 0.581);
+}
+
+.ticker-title {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  letter-spacing: .2px;
+}
+
+.ticker-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 11.5px;
+}
+
+.ticker-label {
+  opacity: .9;
+}
+
+.ticker-value {
+  opacity: .95;
+}
+
+.ticker-pct {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+
+.ticker-pct.up {
+  color: #11c26f;
+  background: rgba(17, 194, 111, .12);
+  border-color: rgba(17, 194, 111, .22);
+}
+
+.ticker-pct.down {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, .12);
+  border-color: rgba(255, 77, 79, .22);
+}
+
+.ticker-ts {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.ticker-skeleton {
+  height: 18px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, .02), rgba(255, 255, 255, .06), rgba(255, 255, 255, .02));
+  background-size: 200% 100%;
+  animation: sk 1.2s linear infinite;
+  margin: 6px 0;
+}
+
+@keyframes sk {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ============================================================
+   SMALL/UTILITY RULES (responsive helpers, small fixes)
+   ============================================================ */
+.sidebar {
+  gap: 10px;
+  padding: 12px;
+}
+
+.brand-row.small {
+  gap: 8px;
+}
+
+.toggle.tiny {
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.sidebar-avatar.tiny {
+  width: 28px;
+  height: 28px;
+}
+
+@media (max-width: 1200px) {
+  :root {
+    --lottie-shift-x: 1vw;
+    --lottie-shift-y: -36px;
+  }
+}
+
+@media (max-width: 980px) {
+  .landing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lottie-free {
+    height: clamp(220px, 36vh, 420px);
+  }
+}
+
+/* accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .app-shell,
+  .topnav,
+  .sidebar,
+  .lottie-free {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+
+/* =============================
+   SIDEBAR — orange active + avatar
+   ============================= */
+
+/* 1) Active nav item: subtle dark background + orange left accent (no layout shift) */
+.nav.compact a.active {
+  background: rgba(255, 255, 255, 0.02) !important;
+  /* inset left accent instead of actual border to avoid content shift */
+  box-shadow: inset 4px 0 0 0 var(--accent-orange), 0 6px 18px rgba(0, 0, 0, .45);
+  border-color: rgba(255, 255, 255, .04) !important;
+  color: var(--ink) !important;
+}
+
+/* also make hover look consistent with active */
+.nav.compact a:hover {
+  box-shadow: inset 4px 0 0 0 rgba(255, 122, 24, 0.06), 0 6px 18px rgba(0, 0, 0, .45);
+}
+
+/* 2) Ensure the nav-item icon area doesn't get covered by the inset accent:
+   add a small left padding so text doesn't collide with the inset accent */
+.nav.compact a {
+  padding-left: 12px !important;
+}
+
+/* Keep the icon visually aligned: shrink the icon container slightly if needed */
+.nav.compact a .nav-item svg,
+.nav.compact .nav-item svg {
+  margin-left: -2px;
+}
+
+/* === ORANGE TOOLTIP STYLE OVERRIDE === */
+.sidebar.collapsed .nav-item::after {
+  background: var(--accent-orange, #ff7a1a);
+  /* orange tooltip */
+  color: #ffffff;
+  /* white text */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  /* subtle border */
+  border-radius: 10px;
+  /* rounded corners */
+  padding: 6px 10px;
+  /* slightly wider */
+  font-weight: 500;
+  box-shadow: 0 6px 18px rgba(255, 122, 26, 0.28);
+  /* orange glow */
+}
+
+/* triangle pointer (small arrow) */
+.sidebar.collapsed .nav-item::before {
+  border-right-color: var(--accent-orange, #ff7a1a);
+  /* match tooltip bg */
+  opacity: 0;
+  /* default hidden, shows on hover */
+}
+
+/* show on hover */
+.sidebar.collapsed .nav-item:hover::before {
+  opacity: 1;
+}
+
+/* 3) Sidebar user chip: orange outline + subtle glow to match topnav */
+.sidebar-user {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), rgba(255, 255, 255, 0.01));
+  border: 1.5px solid rgba(255, 122, 24, 0.16);
+  /* gentle orange border */
+  box-shadow: 0 6px 20px rgba(255, 122, 24, 0.03), inset 0 0 0 1px rgba(255, 255, 255, 0.01);
+  transition: box-shadow .15s ease, border-color .12s ease, transform .12s ease;
+}
+
+/* Slight lift on hover/focus for user chip */
+.sidebar-user:hover,
+.sidebar-user:focus-within {
+  transform: translateY(-2px);
+  border-color: var(--accent-orange);
+  box-shadow: 0 10px 34px rgba(255, 122, 24, 0.06);
+}
+
+/* 4) Avatar: orange ring and initials in orange.
+   Keep avatar background dark so initials remain visible. */
+.sidebar-avatar {
+  background: radial-gradient(60% 60% at 40% 35%, #07101a 0%, #0b1420 100%);
+  border: 2px solid rgba(255, 122, 24, 0.16);
+  /* orange ring */
+  color: var(--accent-orange);
+  /* initials colored orange */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .45), 0 0 10px rgba(255, 122, 24, 0.04);
+  font-weight: 900;
+}
+
+/* stronger ring on hover/focus */
+.sidebar-avatar:hover,
+.sidebar-avatar:focus {
+  border-color: var(--accent-orange);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .5), 0 0 18px rgba(255, 122, 24, 0.10);
+}
+
+/* tiny avatar variant */
+.sidebar-avatar.tiny {
+  border-width: 1.6px;
+}
+
+/* 5) If you want the avatar to also show a filled orange circle background (alternate style)
+   uncomment the rules below and comment out the background above. */
+
+/*
+.sidebar-avatar {
+  background: var(--accent-orange);
+  color: #07101a;   // dark text on orange background
+  border: 2px solid rgba(255,255,255,0.02);
+}
+*/
+
+/* 6) Accessibility: ensure focus-visible is strong enough to be noticed by keyboard users */
+.sidebar-avatar:focus-visible,
+.sidebar-user:focus-within {
+  outline: none;
+  box-shadow:
+    0 8px 28px rgba(255, 122, 24, 0.08),
+    0 0 0 4px rgba(255, 122, 24, 0.06);
+}
+
+/* 7) Small responsive tweak: reduce inset accent on very small screens */
+@media (max-width: 680px) {
+  .nav.compact a.active {
+    box-shadow: inset 3px 0 0 0 var(--accent-orange);
+  }
+
+  .nav.compact a {
+    padding-left: 10px !important;
+  }
+}
+
+/* ============================
+   Sidebar collapse toggle — transparent
+   ============================ */
+
+/* Use the brand-row selector for higher specificity so it overrides any generic button styles */
+.brand-row.small .toggle.tiny,
+.sidebar .toggle.tiny {
+  background: transparent;
+  /* remove white bg */
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  /* subtle outline to keep it visible */
+  color: var(--ink);
+  /* text/icon color */
+  border-radius: 8px;
+  padding: 6px 8px;
+  min-width: 36px;
+  /* keep button square-ish */
+  height: 32px;
+  display: inline-grid;
+  place-items: center;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background .12s ease, transform .08s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+/* subtle hover that complements the app without becoming dominant */
+.brand-row.small .toggle.tiny:hover,
+.sidebar .toggle.tiny:hover {
+  background: rgba(255, 255, 255, 0.02);
+  /* tiny reveal on hover */
+  border-color: rgba(255, 122, 24, 0.08);
+  /* hint of orange on hover */
+  /* transform: translateY(-1px); */
+}
+
+/* pressed/focus states */
+.brand-row.small .toggle.tiny:active,
+.sidebar .toggle.tiny:active {
+  transform: translateY(0);
+}
+
+.brand-row.small .toggle.tiny:focus-visible,
+.sidebar .toggle.tiny:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255, 122, 24, 0.06);
+  /* keyboard-visible orange ring */
+}
+
+
+
+
+/* center CTA under hero text */
+.hero-actions {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  /* centers the button horizontally */
+}
+
+/* optional: keep the button visually consistent but tighter */
+.hero-actions .button {
+  border: 1.5px solid var(--accent-orange);
+  color: var(--accent-orange);
+  padding: 10px 18px;
+}
+
+/* container below landing where you can add more sections */
+.below-landing {
+  width: min(1120px, 94vw);
+  margin: 40px auto;
+  /* separates the next sections from the hero */
+  padding: 12px;
+  display: grid;
+  gap: 24px;
+}
+
+
+.plain-footer {
+  padding: 36px 18px 18px 36px;
+  border-top: 1px solid rgba(255, 255, 255, .04);
+  background: linear-gradient(180deg, #07101a, #0b1220);
+  color: var(--ink);
+}
+
+.plain-footer__container {
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.plain-col h3,
+.plain-col h4 {
+  margin: 0 0 8px;
+}
+
+.plain-subscribe {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* .plain-input{ padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:rgba(255,255,255,0.02); color:var(--ink); } */
+.plain-btn {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--accent-orange);
+  color: #fff;
+  border: 0;
+  cursor: pointer;
+}
+
+.plain-footer__bottom {
+  max-width: 1120px;
+  margin: 18px auto 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  border-top: 1px solid rgba(255, 255, 255, .02);
+  padding-top: 18px;
+}
+
+.plain-socials a {
+  margin-right: 8px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.plain-toggle {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .04);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.plain-chat {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 60;
+}
+
+.plain-chat__window {
+  width: 300px;
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, .04);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+}
+
+.plain-chat__messages {
+  height: 160px;
+  overflow: auto;
+  margin-bottom: 8px;
+}
+
+.plain-chat__form {
+  display: flex;
+  gap: 8px;
+}
+
+
+/* ---------------------------
+   PlainFooter styles (polished)
+   --------------------------- */
+.plain-footer {
+  background: linear-gradient(180deg, rgba(11, 18, 32, 0.85), rgba(7, 16, 26, 0.9));
+  color: var(--ink);
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  /* padding: 40px 20px; */
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+
+  /* spacing */
+  /* padding: 40px 32px; */
+}
+
+.plain-footer__container {
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+/* Brand column */
+.plain-brand .plain-title {
+  margin: 0 0 10px;
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+
+.plain-lead {
+  color: var(--muted);
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+/* Subscribe */
+.plain-subscribe__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.plain-input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--ink);
+  outline: none;
+  min-width: 0;
+}
+
+.plain-input:focus {
+  border-color: var(--accent-orange) !important;
+  box-shadow:
+    0 0 0 2px rgba(255, 122, 24, 0.25),
+    0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.plain-btn {
+  background: linear-gradient(180deg, var(--brand-2), var(--brand));
+  color: var(--ink);
+  border: 0;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.plain-btn:focus-visible {
+  outline: 3px solid rgba(91, 61, 245, 0.12);
+  outline-offset: 2px;
+}
+
+.plain-btn--icon {
+  padding: 8px;
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  border-radius: 999px;
+}
+
+.plain-btn--outline {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--ink);
+}
+
+/* links & nav */
+.plain-links h4,
+.plain-contact h4,
+.plain-social h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.plain-nav a {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.plain-nav a:hover {
+  color: var(--accent-orange);
+}
+
+/* contact */
+.plain-address {
+  font-style: normal;
+  color: var(--muted);
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--muted);
+}
+
+.contact-row .icon {
+  opacity: 0.95;
+}
+
+/* socials */
+.plain-socials {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.plain-social {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+
+.plain-social:hover {
+  color: var(--accent-orange);
+}
+
+/* .plain-social:hover{ background: rgba(255,255,255,0.02); color:var(--ink); } */
+
+.plain-footer__bottom {
+  width: 100%;
+  margin-top: 26px;
+  padding-top: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.bottom-links a {
+  margin-left: 12px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.bottom-links a:hover {
+  color: var(--accent-orange);
+}
+
+/* chat drawer */
+.plain-chat {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 60;
+  transform: translateY(18px) scale(.98);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform .22s ease, opacity .22s ease;
+}
+
+.plain-chat--open {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.plain-chat__window {
+  width: min(380px, 92vw);
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.plain-chat__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.plain-chat__messages {
+  padding: 12px;
+  height: 160px;
+  overflow: auto;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), transparent);
+  color: var(--muted);
+}
+
+.plain-chat__form {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.plain-chat__close {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* utility */
+.icon {
+  width: 18px;
+  height: 18px;
+}
+
+.plain-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .plain-footer__container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .plain-socials {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .plain-footer__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 520px) {
+  .plain-footer__container {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .plain-chat {
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+/* helper for screen-reader-only labels */
+.sr-only {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+  margin: -1px;
+}
+
+.plain-btn--orange {
+  background: var(--accent-orange) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 6px 20px rgba(255, 122, 24, 0.35);
+}
+
+.plain-btn--orange:hover {
+  background: color-mix(in srgb, var(--accent-orange) 85%, white 10%);
+  transform: translateY(-1px);
+}
+
+.plain-btn--orange:active {
+  transform: translateY(0);
+}
+
+
+/* full-window image section */
+.landing-full-image {
+  width: 100vw;
+  /* full bleed across entire screen */
+  height: 100vh;
+  /* takes full viewport height */
+  margin-left: calc(50% - 50vw);
+  /* break out of centered container */
+  margin-right: calc(50% - 50vw);
+  overflow: hidden;
+  /* hide overflow if needed */
+}
+
+.landing-full-image-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* maintains aspect ratio without distortion */
+  object-position: center;
+  /* keep focus in the center of the image */
+}
+
+.landing-full-image-img {
+  opacity: 0;
+  transform: scale(1.05);
+  animation: fadeInImage 1.2s ease forwards;
+}
+
+@keyframes fadeInImage {
+  to {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+}
+
+/* Full-width hero section with text overlay */
+.image-hero {
+  position: relative;
+  width: 100vw;
+  /* FULL viewport width */
+  height: 100vh;
+  /* FULL viewport height (change if needed) */
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  /* TRICK: makes it break out of parent padding */
+  margin-right: -50vw;
+  overflow: hidden;
+  margin-top: -50px;
+}
+
+
+.image-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: brightness(25%);
+  /* darken image for text visibility */
+}
+
+/* Text content on top of image */
+.image-hero-text {
+  position: absolute;
+  top: 40%;
+  left: 10%;
+  transform: translateY(-50%);
+  color: rgb(244, 177, 106);
+  max-width: 650px;
+}
+
+.image-hero-text h1 {
+  font-size: 48px;
+  line-height: 1.2;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.image-hero-text p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+.hero-learn-btn {
+  background: #ff8903;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgb(255, 255, 255);
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.hero-learn-btn:hover {
+  background: #cc722e;
+}
+
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgb(255, 166, 0);
+  /* orange border */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: orange;
+  /* <-- text inside avatar in orange */
+  background: transparent;
+}
+
+.avatar span {
+  color: orange;
+  /* ensure initials inside are orange */
+}
+
+
+/* If you are using role-based variants (optional) */
+.avatar.user,
+.avatar.assistant,
+.avatar.ai {
+  border-color: rgb(249, 193, 90);
+  color: orange;
+}
+
+/* ============================================================
+   FIXES FOR CHAT LAYOUT (these override the global layout)
+   ============================================================ */
+
+/* Allow centered ChatInput wrapper to overflow */
+.main.chat-panel .content {
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Ensure the footer inside chat uses the layout from Chat.jsx */
+.main.chat-panel .footer {
+  position: sticky !important;
+  bottom: 20px !important;
+  border-radius: 12px !important;
+}
+
+/* ===========================
+   Footer: Quick Links bottom + horizontal
+   =========================== */
+
+/* Keep footer grid but make the links column align to the bottom of the row */
+.plain-links {
+  /* push this column to the bottom of the footer grid cell */
+  align-self: end;
+  display: flex;
+  flex-direction: column;
+  /* keep heading above, nav below */
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Make quick-links nav horizontal instead of stacked links */
+.plain-nav {
+  display: flex;
+  flex-wrap: wrap;
+  /* allow wrapping on narrow screens */
+  gap: 18px;
+  /* horizontal spacing between links */
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* Individual links become inline items */
+.plain-nav a {
+  display: inline-block;
+  margin: 0;
+  color: var(--muted);
+  padding: 4px 6px;
+  transition: color .12s ease, transform .08s ease;
+}
+
+.plain-nav a:hover {
+  color: var(--accent-orange);
+}
+
+/* ===========================
+   Footer: Follow Us + socials inline
+   =========================== */
+
+/* Make the "follow" column heading and icons sit in one horizontal line */
+.plain-social {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Container holding the icons — show them horizontally */
+.plain-socials {
+  display: flex;
+  flex-direction: row;
+  /* horizontal icons */
+  gap: 10px;
+  align-items: center;
+}
+
+/* Each social anchor becomes a compact inline icon button */
+.plain-socials .plain-social {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 8px;
+  color: var(--muted);
+  transition: color .12s ease, background .12s ease, transform .08s ease;
+}
+
+.plain-socials .plain-social:hover {
+  color: var(--accent-orange);
+  background: rgba(255, 122, 24, 0.04);
+  transform: translateY(-2px);
+}
+
+/* Slight spacing between the "Follow Us On" text and icons on smaller footprints */
+.plain-social h4 {
+  margin-right: 6px;
+}
+
+/* ===========================
+   Responsive rules
+   =========================== */
+
+@media (max-width: 900px) {
+
+  /* On smaller screens keep quick links horizontal but allow wrapping and a small top offset */
+  .plain-links {
+    align-self: start;
+  }
+
+  /* easier stacking when overall footer columns collapse */
+  .plain-nav {
+    gap: 12px;
+  }
+
+  .plain-footer__container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .plain-social {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+
+  /* Mobile: stack everything vertically for readability */
+  .plain-links {
+    align-self: start;
+  }
+
+  .plain-nav {
+    gap: 10px;
+  }
+
+  .plain-socials {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .plain-footer__container {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+/* ============================================================
+   FOOTER — Align section headings in one horizontal line
+   ============================================================ */
+
+/* Turn the 3 right columns into a 3-column header row */
+.plain-footer__container {
+  align-items: start;
+}
+
+/* Force all section headings to align horizontally */
+.plain-links h4,
+.plain-contact h4,
+.plain-social h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  white-space: nowrap;
+}
+
+/* Ensure columns start at the same vertical point */
+.plain-links,
+.plain-contact,
+.plain-social {
+  padding-top: 6px;
+  /* adjust as needed */
+}
+
+/* Make the 'Follow Us On' heading and icons align evenly */
+.plain-social {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Keep icons inline */
+.plain-socials {
+  display: flex;
+  gap: 10px;
+}
+
+/* Responsive behavior */
+@media (max-width: 900px) {
+
+  .plain-links,
+  .plain-contact,
+  .plain-social {
+    padding-top: 0;
+  }
+}
+
+/* ============================
+   Footer: force all headings to sit on one horizontal row
+   (Drop this at the end of your CSS)
+   ============================ */
+
+/* Make each footer column a vertical stack so headings align consistently */
+.plain-footer__container .plain-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* space between heading and content */
+  align-items: flex-start;
+}
+
+/* Treat the brand title like the other h4 headings so alignment matches */
+.plain-brand>p:first-child {
+  margin: 0;
+  font-size: 15px;
+  /* same visual weight as other headings */
+  font-weight: 900;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* Reset any rule that pushed quick-links to the bottom */
+.plain-links {
+  align-self: start !important;
+  /* ensure quick links column starts at the same vertical level */
+  justify-content: flex-start;
+  padding-top: 0;
+}
+
+/* Remove the "push to bottom" behavior for consistency */
+.plain-links h4,
+.plain-contact h4,
+.plain-social h4,
+.plain-brand>p:first-child {
+  margin-top: 0;
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+
+/* Keep the quick-links list horizontal, but place it under its heading */
+.plain-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Make sure socials heading and icons stay aligned horizontally */
+.plain-social {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* If the brand column includes the subscribe form and you want it tucked slightly
+   lower than the headings on very small screens, allow a small top padding fallback */
+@media (max-width: 900px) {
+  .plain-footer__container {
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start !important;
+  }
+
+  .plain-links {
+    align-self: start;
+  }
+
+  .plain-brand>p:first-child {
+    font-size: 1.05rem;
+  }
+
+  /* keep brand readable */
+}
+
+
+
+/* make every footer column a predictable vertical stack */
+.plain-footer__container>.plain-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 8px;
+  padding-top: 0 !important;
+  /* remove any per-column top nudges */
+}
+
+/* normalize the brand "FinAgentAI" heading to match h4s */
+.plain-brand>p:first-child {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--ink);
+  white-space: nowrap;
+  line-height: 1;
+  /* remove subtle baseline shift */
+}
+
+/* unify heading styles so they match exactly */
+.plain-links h4,
+.plain-contact h4,
+.plain-social h4,
+.plain-brand>p:first-child {
+  margin-top: 0;
+  margin-bottom: 12px;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* remove previous rule that pushed quick-links to bottom */
+.plain-links {
+  align-self: start !important;
+}
+
+/* ensure socials and contact don't have extra padding */
+.plain-contact,
+.plain-social {
+  padding-top: 0 !important;
+}
+
+/* keep quick links horizontal but right under the heading */
+.plain-nav {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+}
+
+/* responsive: keep layout usable on small screens */
+@media (max-width: 980px) {
+  .plain-footer__container {
+    grid-template-columns: repeat(2, 1fr);
+    min-width: auto;
+  }
+
+  .plain-footer__container>.plain-col {
+    padding-top: 0;
+  }
+
+  .plain-brand>p:first-child {
+    font-size: 1.05rem;
+  }
+}
