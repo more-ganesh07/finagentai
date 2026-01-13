@@ -34,6 +34,7 @@ class VoiceToTextService:
         self.client = None
         self.is_streaming = False
         self.transcript_queue = Queue()
+        self.audio_queue = Queue()
         self.on_transcript_callback = None
         
     def set_transcript_callback(self, callback: Callable[[str], None]):
@@ -129,26 +130,50 @@ class VoiceToTextService:
         
         self.is_streaming = True
         
-        # Only start local microphone thread if use_mic is True
+        # Start streaming thread
         if use_mic:
-            stream_thread = threading.Thread(
-                target=self._stream_audio,
-                args=(device_index,),
-                daemon=True
-            )
-            stream_thread.start()
-            return "Streaming started with local microphone"
+            target = self._stream_audio
+            args = (device_index,)
+        else:
+            # Clear audio queue for fresh session
+            while not self.audio_queue.empty():
+                try: self.audio_queue.get_nowait()
+                except: break
+            target = self._stream_audio_external
+            args = ()
+
+        stream_thread = threading.Thread(
+            target=target,
+            args=args,
+            daemon=True
+        )
+        stream_thread.start()
         
-        return "Streaming initialized for external audio input"
+        return "Streaming started with local microphone" if use_mic else "Streaming initialized for external audio input"
     
     def stream_audio_chunk(self, audio_data: bytes):
-        """Push raw audio data to AssemblyAI client"""
-        if self.client and self.is_streaming:
-            try:
-                self.client.stream_audio(audio_data)
-            except Exception as e:
-                logger.error(f"Error streaming audio chunk: {e}")
+        """Push raw audio data to the audio queue"""
+        if self.is_streaming:
+            self.audio_queue.put(audio_data)
                 
+    def _get_audio_generator(self):
+        """Generator that yields audio chunks from the queue"""
+        while self.is_streaming:
+            try:
+                # Use a timeout so we can check is_streaming periodically
+                chunk = self.audio_queue.get(timeout=1.0)
+                yield chunk
+            except:
+                continue
+
+    def _stream_audio_external(self):
+        """Internal method to stream audio from the audio queue"""
+        try:
+            self.client.stream(self._get_audio_generator())
+        except Exception as e:
+            logger.error(f"Streaming error (External): {e}")
+            self.is_streaming = False
+
     def _stream_audio(self, device_index: Optional[int] = None):
         """Internal method to stream audio from local microphone (legacy/local only)"""
         try:

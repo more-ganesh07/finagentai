@@ -523,58 +523,6 @@ async def stt_status():
         }
     }
 
-@app.post("/stt/start")
-async def stt_start():
-    """Start the voice transcription session"""
-    try:
-        msg = app.state.stt_service.start_streaming()
-        return {"status": "success", "message": msg}
-    except Exception as e:
-        logger.error(f"STT Start Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/stt/stop")
-async def stt_stop():
-    """Stop the voice transcription session"""
-    try:
-        msg = app.state.stt_service.stop_streaming()
-        return {"status": "success", "message": msg}
-    except Exception as e:
-        logger.error(f"STT Stop Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/stt/stream")
-async def stt_stream():
-    """Stream transcripts from the microphone in real-time"""
-    stt = app.state.stt_service
-    
-    async def event_generator():
-        while True:
-            # Check if we should stop
-            if not stt.is_streaming and stt.transcript_queue.empty():
-                break
-                
-            transcript = stt.get_transcript(timeout=0.1)
-            if transcript:
-                yield f"data: {json.dumps(transcript)}\n\n"
-            
-            await asyncio.sleep(0.01)
-            
-    return StreamingResponse(
-        event_generator(),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "X-Accel-Buffering": "no"
-        }
-    )
-
-
-# ─────────────────────────────────────────────
-# 📊 6 MARKET INDICES (Second-by-Second Real-time)
-# ─────────────────────────────────────────────
-
 @app.websocket("/stt/ws")
 async def stt_websocket(websocket: WebSocket):
     """

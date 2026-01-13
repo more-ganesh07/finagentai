@@ -248,7 +248,7 @@ export default function AI_Voice({
       socketRef.current = socket;
 
       socket.onopen = () => {
-        console.log("STT WebSocket connected");
+        console.log("🚀 STT WebSocket connected successfully!");
 
         // 3. Setup AudioContext for PCM capture
         const audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 44100 });
@@ -260,10 +260,18 @@ export default function AI_Voice({
         const processor = audioContext.createScriptProcessor(4096, 1, 1);
         processorRef.current = processor;
 
+        let lastLog = 0;
         processor.onaudioprocess = (e) => {
           if (socket.readyState !== WebSocket.OPEN) return;
 
           const inputData = e.inputBuffer.getChannelData(0);
+
+          // Debug: log volume every 2 seconds
+          if (Date.now() - lastLog > 2000) {
+            const vol = inputData.reduce((a, b) => a + Math.abs(b), 0) / inputData.length;
+            console.log(`🎤 Recording volume: ${(vol * 100).toFixed(2)}%`);
+            lastLog = Date.now();
+          }
 
           // Convert Float32 to Int16 PCM
           const pcmData = new Int16Array(inputData.length);
