@@ -34,7 +34,7 @@ export default function Landing() {
         <div className="landing-grid">
           <div className="landing-card">
             <h1 className="hero-title">
-              <span className="hero-dim">AI Investment Agent : </span>{" "}
+              <span className="hero-dim">AI Investment Agent: </span>{" "}
               <RotatingText
                 texts={["Ask about Trends.", "Grill your Holdings!", "Ship Polished Reports."]}
                 mainClassName="hero-pill"
