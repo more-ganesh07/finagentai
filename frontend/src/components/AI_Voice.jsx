@@ -201,7 +201,7 @@
 import { Mic } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import "./AI_Voice.css";
-import { sttStart, sttStop, sttStream } from "../services/api";
+import { sttWebSocket } from "../services/api";
 
 /**
  * Small, plain-CSS mic button component.
@@ -218,16 +218,17 @@ export default function AI_Voice({
 }) {
   const [listening, setListening] = useState(false);
   const [countdown, setCountdown] = useState(null); // Countdown 3, 2, 1
-  const abortControllerRef = useRef(null);
+  const socketRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const processorRef = useRef(null);
+  const streamRef = useRef(null);
   const committedTextRef = useRef(""); // To store finalized sentences
-  const pendingTurnRef = useRef(""); // To store the latest final version of a turn (potentially unformatted)
+  const pendingTurnRef = useRef(""); // To store the latest final version of a turn
 
   // Clean up on unmount
   useEffect(() => {
     return () => {
-      if (listening) {
-        handleStop();
-      }
+      handleStop();
     };
   }, []);
 
@@ -235,54 +236,85 @@ export default function AI_Voice({
     try {
       setListening(true);
       onListeningChange(true);
-      committedTextRef.current = ""; // Reset on new session
+      committedTextRef.current = "";
       pendingTurnRef.current = "";
 
-      // 1. Tell backend to start recording
-      await sttStart();
+      // 1. Get user media (microphone)
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
 
-      // 2. Start streaming transcripts
-      const controller = new AbortController();
-      abortControllerRef.current = controller;
+      // 2. Initialize WebSocket
+      const socket = sttWebSocket();
+      socketRef.current = socket;
 
-      // Start the stream in background
-      sttStream(
-        (data) => {
-          // data = { text: "...", is_final: boolean, is_formatted: boolean }
-          const text = data.text || "";
-          const isFinal = data.is_final;
-          const isFormatted = data.is_formatted;
+      socket.onopen = () => {
+        console.log("STT WebSocket connected");
 
-          if (!isFinal && pendingTurnRef.current) {
-            // A new turn started, so we commit the previous one now if it wasn't already
-            const p = committedTextRef.current;
-            committedTextRef.current = p ? p + " " + pendingTurnRef.current : pendingTurnRef.current;
-            pendingTurnRef.current = "";
+        // 3. Setup AudioContext for PCM capture
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 44100 });
+        audioContextRef.current = audioContext;
+        const source = audioContext.createMediaStreamSource(stream);
+
+        // Use ScriptProcessor for wide compatibility (or AudioWorklet for modern)
+        // 4096 buffer size, 1 input channel, 1 output channel
+        const processor = audioContext.createScriptProcessor(4096, 1, 1);
+        processorRef.current = processor;
+
+        processor.onaudioprocess = (e) => {
+          if (socket.readyState !== WebSocket.OPEN) return;
+
+          const inputData = e.inputBuffer.getChannelData(0);
+
+          // Convert Float32 to Int16 PCM
+          const pcmData = new Int16Array(inputData.length);
+          for (let i = 0; i < inputData.length; i++) {
+            const s = Math.max(-1, Math.min(1, inputData[i]));
+            pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
           }
 
-          const prefix = committedTextRef.current ? committedTextRef.current + " " : "";
-          const displayText = prefix + text;
+          socket.send(pcmData.buffer);
+        };
 
-          onTranscript(displayText);
+        source.connect(processor);
+        processor.connect(audioContext.destination);
+      };
 
-          if (isFinal) {
-            if (isFormatted) {
-              // Definitive version received, commit immediately and clear pending
-              committedTextRef.current = displayText;
-              pendingTurnRef.current = "";
-            } else {
-              // Final but raw, hold as pending in case a formatted one follows
-              pendingTurnRef.current = text;
-            }
-          }
-        },
-        controller.signal
-      ).catch(err => {
-        if (err.name !== 'AbortError') {
-          console.error("Stream failed:", err);
-          handleStop();
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        const text = data.text || "";
+        const isFinal = data.is_final;
+        const isFormatted = data.is_formatted;
+
+        if (!isFinal && pendingTurnRef.current) {
+          const p = committedTextRef.current;
+          committedTextRef.current = p ? p + " " + pendingTurnRef.current : pendingTurnRef.current;
+          pendingTurnRef.current = "";
         }
-      });
+
+        const prefix = committedTextRef.current ? committedTextRef.current + " " : "";
+        const displayText = prefix + text;
+
+        onTranscript(displayText);
+
+        if (isFinal) {
+          if (isFormatted) {
+            committedTextRef.current = displayText;
+            pendingTurnRef.current = "";
+          } else {
+            pendingTurnRef.current = text;
+          }
+        }
+      };
+
+      socket.onerror = (err) => {
+        console.error("STT WebSocket error:", err);
+        handleStop();
+      };
+
+      socket.onclose = () => {
+        console.log("STT WebSocket closed");
+        handleStop();
+      };
 
     } catch (e) {
       console.error("Failed to start voice:", e);
@@ -291,23 +323,34 @@ export default function AI_Voice({
     }
   };
 
-  const handleStop = async () => {
+  const handleStop = () => {
     try {
-      // 1. Abort the stream
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-        abortControllerRef.current = null;
+      // 1. Stop Audio Processing
+      if (processorRef.current) {
+        processorRef.current.disconnect();
+        processorRef.current = null;
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
       }
 
-      // If we had a final unformatted turn that never got a formatted counterpart, commit it now
+      // 2. Close WebSocket
+      if (socketRef.current) {
+        socketRef.current.close();
+        socketRef.current = null;
+      }
+
+      // Final commit logic
       if (pendingTurnRef.current) {
         const p = committedTextRef.current;
         committedTextRef.current = p ? p + " " + pendingTurnRef.current : pendingTurnRef.current;
         pendingTurnRef.current = "";
       }
-
-      // 2. Tell backend to stop recording
-      await sttStop();
 
     } catch (e) {
       console.error("Failed to stop voice:", e);

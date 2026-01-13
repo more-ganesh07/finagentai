@@ -426,10 +426,14 @@ export async function sttStop() {
 }
 
 /**
- * STT Service - Stream transcripts
- * @param {Function} onTranscript - Callback for real-time transcripts
- * @param {AbortSignal} signal - Signal to abort the stream
+ * STT Service - WebSocket instance
+ * @returns {WebSocket}
  */
+export function sttWebSocket() {
+    const wsUrl = API_BASE_URL.replace(/^http/, 'ws') + '/stt/ws';
+    return new WebSocket(wsUrl);
+}
+
 export async function sttStream(onTranscript, signal) {
     try {
         const response = await fetch(`${API_BASE_URL}/stt/stream`, {

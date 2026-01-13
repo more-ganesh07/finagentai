@@ -94,15 +94,16 @@ class VoiceToTextService:
         except Exception as e:
             return False, f"Microphone error: {str(e)}"
     
-    def start_streaming(self, device_index: Optional[int] = None):
+    def start_streaming(self, device_index: Optional[int] = None, use_mic: bool = False):
         """Start streaming transcription"""
         if self.is_streaming:
             raise RuntimeError("Already streaming")
         
-        # Test microphone
-        is_available, message = self.test_microphone()
-        if not is_available:
-            raise RuntimeError(message)
+        # Test microphone only if use_mic is True
+        if use_mic:
+            is_available, message = self.test_microphone()
+            if not is_available:
+                raise RuntimeError(message)
         
         # Create client
         self.client = StreamingClient(
@@ -126,19 +127,30 @@ class VoiceToTextService:
             )
         )
         
-        # Start streaming in thread
         self.is_streaming = True
-        stream_thread = threading.Thread(
-            target=self._stream_audio,
-            args=(device_index,),
-            daemon=True
-        )
-        stream_thread.start()
         
-        return "Streaming started"
+        # Only start local microphone thread if use_mic is True
+        if use_mic:
+            stream_thread = threading.Thread(
+                target=self._stream_audio,
+                args=(device_index,),
+                daemon=True
+            )
+            stream_thread.start()
+            return "Streaming started with local microphone"
+        
+        return "Streaming initialized for external audio input"
     
+    def stream_audio_chunk(self, audio_data: bytes):
+        """Push raw audio data to AssemblyAI client"""
+        if self.client and self.is_streaming:
+            try:
+                self.client.stream_audio(audio_data)
+            except Exception as e:
+                logger.error(f"Error streaming audio chunk: {e}")
+                
     def _stream_audio(self, device_index: Optional[int] = None):
-        """Internal method to stream audio"""
+        """Internal method to stream audio from local microphone (legacy/local only)"""
         try:
             mic_params = {"sample_rate": 44100}
             if device_index is not None:
@@ -146,7 +158,7 @@ class VoiceToTextService:
             
             self.client.stream(aai.extras.MicrophoneStream(**mic_params))
         except Exception as e:
-            logger.error(f"Streaming error: {e}")
+            logger.error(f"Streaming error (Mic): {e}")
             self.is_streaming = False
     
     def stop_streaming(self):

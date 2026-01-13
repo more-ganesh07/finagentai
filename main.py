@@ -2,7 +2,7 @@ import os
 import json
 import logging
 import asyncio
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from contextlib import asynccontextmanager
@@ -574,6 +574,55 @@ async def stt_stream():
 # ─────────────────────────────────────────────
 # 📊 6 MARKET INDICES (Second-by-Second Real-time)
 # ─────────────────────────────────────────────
+
+@app.websocket("/stt/ws")
+async def stt_websocket(websocket: WebSocket):
+    """
+    WebSocket for bidirectional STT streaming.
+    - Receives binary audio chunks from browser
+    - Sends JSON transcripts back to browser
+    """
+    await websocket.accept()
+    stt = app.state.stt_service
+    
+    try:
+        # 1. Initialize AssemblyAI streaming
+        stt.start_streaming(use_mic=False)
+        
+        # 2. Define a task to read transcripts from the queue and send them to the websocket
+        async def send_transcripts():
+            try:
+                while True:
+                    # Non-blocking check for transcripts
+                    transcript = stt.get_transcript(timeout=0.01)
+                    if transcript:
+                        await websocket.send_json(transcript)
+                    await asyncio.sleep(0.01)
+            except Exception as e:
+                logger.error(f"Error in transcript sender: {e}")
+
+        # Start the sender task
+        sender_task = asyncio.create_task(send_transcripts())
+        
+        # 3. Handle incoming binary data (audio)
+        try:
+            while True:
+                data = await websocket.receive_bytes()
+                if data:
+                    stt.stream_audio_chunk(data)
+        except WebSocketDisconnect:
+            logger.info("STT WebSocket disconnected")
+        finally:
+            sender_task.cancel()
+            stt.stop_streaming()
+            
+    except Exception as e:
+        logger.error(f"STT WebSocket Error: {e}", exc_info=True)
+        try:
+            await websocket.send_json({"type": "error", "message": str(e)})
+            await websocket.close()
+        except:
+            pass
 
 @app.get("/market_indices")
 async def market_indices():
