@@ -152,10 +152,14 @@ class LoginAgent(Agent):
         """
         try:
             login_res = await self.kite_client.call("login", {})
-            return self.kite_client.extract_login_url(login_res)
+            url = self.kite_client.extract_login_url(login_res)
+            if not url:
+                raw = self.kite_client._collect_text_chunks(login_res)
+                raise RuntimeError(f"Could not extract login URL from MCP response. Raw: {raw[:200]}")
+            return url
         except Exception as e:
-            print(f"⚠️ Error fetching login URL: {e}")
-            return None
+            print(f"⚠️ Error fetching login URL: {type(e).__name__}: {e}")
+            raise
 
     async def finalize_session(self) -> Dict[str, Any]:
         """

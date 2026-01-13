@@ -59,7 +59,7 @@ class KiteMCPClient:
     """Stable SSE-based Zerodha Kite MCP client with rate limiting and retry logic."""
 
     def __init__(self,
-                 url: str = "https://mcp.kite.trade/sse",
+                 url: Optional[str] = None,
                  headers: Optional[Dict[str, str]] = None,
                  max_requests_per_second: int = None,
                  max_retries: int = None):
@@ -70,7 +70,16 @@ class KiteMCPClient:
             max_requests_per_second: Maximum requests per second (default: 10)
             max_retries: Maximum retry attempts for failed requests (default: 3)
         """
-        self.transport = SSETransport(url=url, headers=headers or {})
+        # Priority: explicit arg > KITE_MCP_SSE_URL > MCP_SSE_URL > default
+        self.url = url or os.getenv("KITE_MCP_SSE_URL") or os.getenv("MCP_SSE_URL") or "https://mcp.kite.trade/sse"
+        
+        # Ensure headers is a dict
+        self.headers = headers or {}
+        # Add basic User-Agent if not provided
+        if "User-Agent" not in self.headers:
+            self.headers["User-Agent"] = "KiteInfi-Backend/1.0"
+            
+        self.transport = SSETransport(url=self.url, headers=self.headers)
         self._client: Optional[Client] = None
         
         # Rate limiting configuration
@@ -192,13 +201,13 @@ class KiteMCPClient:
         Raises:
             ToolError: If all retry attempts fail
         """
-        if not self._client:
-            await self.connect()
-
         last_error = None
         
         for attempt in range(self.max_retries + 1):
             try:
+                if not self._client:
+                    await self.connect()
+                
                 # Apply rate limiting before each request
                 await self.rate_limiter.acquire()
                 
@@ -250,7 +259,9 @@ class KiteMCPClient:
                 # For other errors, don't retry
                 else:
                     if not silent:
-                        print(f"❌ Tool error: {e}")
+                        import traceback
+                        print(f"❌ Tool error call '{tool_name}': {type(e).__name__}: {e}")
+                        # logging.error(f"MCP tool error: {traceback.format_exc()}")
                     raise
         
         # If we get here, all retries failed
