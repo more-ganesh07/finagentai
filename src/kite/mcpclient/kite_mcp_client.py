@@ -1,23 +1,20 @@
-# src/kite/client/kite_mcp_client.py
+# src/kite/mcpclient/kite_mcp_client.py
 import json
-
 import asyncio
+import anyio
 import contextlib
 import os
 import re
 import time
-import webbrowser
 from typing import Any, Dict, Optional
 
 from fastmcp import Client
 from fastmcp.client.transports import SSETransport
 from fastmcp.exceptions import ToolError
 
-
 # Flexible URL patterns
 KITE_URL_REGEX = re.compile(r"https?://[^\s)]+kite\.[^\s)]+", re.IGNORECASE)
 GENERIC_URL_REGEX = re.compile(r"https?://[^\s)]+", re.IGNORECASE)
-
 
 class RateLimiter:
     """Simple rate limiter using token bucket algorithm."""
@@ -35,25 +32,26 @@ class RateLimiter:
     
     async def acquire(self):
         """Wait until a request can be made without exceeding rate limit."""
-        async with self._lock:
-            now = time.time()
-            
-            # Remove requests outside the time window
-            self.requests = [req_time for req_time in self.requests 
-                           if now - req_time < self.time_window]
-            
-            # If we're at the limit, wait
-            if len(self.requests) >= self.max_requests:
+        while True:
+            async with self._lock:
+                now = time.time()
+                
+                # Remove requests outside the time window
+                self.requests = [req_time for req_time in self.requests 
+                               if now - req_time < self.time_window]
+                
+                # If we're under the limit, record and return
+                if len(self.requests) < self.max_requests:
+                    self.requests.append(now)
+                    return
+                
+                # Calculate how long to wait until the oldest request falls out of window
                 sleep_time = self.time_window - (now - self.requests[0])
-                if sleep_time > 0:
-                    print(f"⏳ Rate limit reached. Waiting {sleep_time:.2f}s...")
-                    await asyncio.sleep(sleep_time)
-                    # Recursively try again
-                    return await self.acquire()
             
-            # Record this request
-            self.requests.append(now)
-
+            # Wait outside the lock to prevent deadlocks
+            if sleep_time > 0:
+                print(f"⏳ Rate limit reached. Waiting {sleep_time:.2f}s...")
+                await asyncio.sleep(sleep_time)
 
 class KiteMCPClient:
     """Stable SSE-based Zerodha Kite MCP client with rate limiting and retry logic."""
@@ -67,30 +65,27 @@ class KiteMCPClient:
         Args:
             url: MCP server URL
             headers: Optional HTTP headers
-            max_requests_per_second: Maximum requests per second (default: 10)
-            max_retries: Maximum retry attempts for failed requests (default: 3)
+            max_requests_per_second: Maximum requests per second (default: 1)
+            max_retries: Maximum retry attempts for failed requests (default: 5)
         """
         # Priority: explicit arg > KITE_MCP_SSE_URL > MCP_SSE_URL > default
         self.url = url or os.getenv("KITE_MCP_SSE_URL") or os.getenv("MCP_SSE_URL") or "https://mcp.kite.trade/sse"
         
-        # Ensure headers is a dict
+        # Source of truth for headers
         self.headers = headers or {}
-        # Add basic User-Agent if not provided
         if "User-Agent" not in self.headers:
             self.headers["User-Agent"] = "KiteInfi-Backend/1.0"
             
-        self.transport = SSETransport(url=self.url, headers=self.headers)
+        self.transport: Optional[SSETransport] = None
         self._client: Optional[Client] = None
         
         # Rate limiting configuration
-        # Rate limiting configuration
-        # Default lowered to 1 RPS to safely handle Kite MCP limits
         max_rps = max_requests_per_second or int(os.getenv("MCP_MAX_REQUESTS_PER_SECOND", "1"))
         self.rate_limiter = RateLimiter(max_requests=max_rps, time_window=1.0)
         
         # Retry configuration
         self.max_retries = max_retries or int(os.getenv("MCP_MAX_RETRIES", "5"))
-        self.retry_delay = float(os.getenv("MCP_RETRY_DELAY", "2.0"))  # Increased initial retry delay
+        self.retry_delay = float(os.getenv("MCP_RETRY_DELAY", "2.0"))
         
         # Persistence configuration
         self.session_file = os.path.join(os.getcwd(), ".kite_session.json")
@@ -110,50 +105,54 @@ class KiteMCPClient:
     # --------------------------
     async def connect(self):
         if self._client is None:
-            # Try to restore session before connecting
+            # Refresh headers from disk if available
             self.restore_session()
             
+            # Always create a fresh transport and client
+            self.transport = SSETransport(url=self.url, headers=self.headers)
             self._client = Client(self.transport)
             await self._client.__aenter__()
+            print(f"🔌 Connected to Kite MCP: {self.url}")
 
     async def close(self, exc_type=None, exc=None, tb=None):
         """Close SSE reader and client cleanly."""
+        # Auto-save before closure
+        self.save_session()
+        
         if self._client:
-            reader = getattr(self.transport, "reader_task", None)
-            if reader and not reader.done():
-                reader.cancel()
-                with contextlib.suppress(Exception):
-                    await reader
+            if self.transport:
+                reader = getattr(self.transport, "reader_task", None)
+                if reader and not reader.done():
+                    reader.cancel()
+                    with contextlib.suppress(Exception):
+                        await reader
 
             with contextlib.suppress(Exception):
                 await self._client.__aexit__(exc_type, exc, tb)
 
         self._client = None
-        # Auto-save on closure if transport has headers
-        self.save_session()
+        self.transport = None
 
     def save_session(self):
-        """Save transport headers to disk for persistence."""
+        """Save headers to disk for persistence."""
         try:
-            if not self.transport.headers:
+            if not self.headers:
                 return
             
-            # Filter headers to avoid sensitive info if possible, 
-            # but for Kite MCP we need the cookies/auth headers.
             with open(self.session_file, "w") as f:
-                json.dump(self.transport.headers, f)
+                json.dump(self.headers, f)
             print(f"💾 Kite session saved to {self.session_file}")
         except Exception as e:
             print(f"⚠️ Error saving session: {e}")
 
     def restore_session(self) -> bool:
-        """Load headers from disk and inject into transport."""
+        """Load headers from disk."""
         try:
             if os.path.exists(self.session_file):
                 with open(self.session_file, "r") as f:
-                    headers = json.load(f)
-                    if headers:
-                        self.transport.headers.update(headers)
+                    saved_headers = json.load(f)
+                    if saved_headers:
+                        self.headers.update(saved_headers)
                         print("📂 Kite session restored from disk.")
                         return True
         except Exception as e:
@@ -163,18 +162,14 @@ class KiteMCPClient:
     def clear_session(self):
         """Wipe session from disk and memory."""
         try:
-            # 1. Clear memory
-            self.transport.headers = {}
-            if self._client:
-                # Only attempt to access session if client exists
-                try:
-                    if hasattr(self._client, "session"):
-                        self._client.session = None
-                except Exception:
-                    # Ignore errors if client is disconnected/inaccessible
-                    pass
+            # 1. Clear memory source of truth
+            self.headers = {"User-Agent": "KiteInfi-Backend/1.0"}
             
-            # 2. Clear disk
+            # 2. Invalidate current client AND transport to force full reconnect
+            self._client = None
+            self.transport = None
+            
+            # 3. Clear disk
             if os.path.exists(self.session_file):
                 os.remove(self.session_file)
                 print(f"🧹 Session file deleted: {self.session_file}")
@@ -183,23 +178,34 @@ class KiteMCPClient:
         except Exception as e:
             print(f"⚠️ Error clearing session: {e}")
 
+    async def force_reconnect(self):
+        """Force a complete teardown and reconnection to MCP server."""
+        try:
+            # Clean up existing client if any
+            if self._client:
+                with contextlib.suppress(Exception):
+                    await self._client.__aexit__(None, None, None)
+            
+            # Reset both client and transport to ensure fresh connection
+            self._client = None
+            self.transport = None
+            
+            # Small delay to allow cleanup
+            await asyncio.sleep(0.1)
+            
+            # Reconnect with fresh transport
+            await self.connect()
+            print("🔄 Force reconnection completed successfully.")
+        except Exception as e:
+            print(f"⚠️ Force reconnection failed: {e}")
+            raise
+
     # --------------------------
     # Tool call with rate limiting and retry
     # --------------------------
     async def call(self, tool_name: str, args: Optional[Dict[str, Any]] = None, silent: bool = False):
         """
         Call MCP tool with rate limiting and automatic retry on failure.
-        
-        Args:
-            tool_name: Name of the tool to call
-            args: Tool arguments
-            silent: If True, suppress error printing (useful for validation checks)
-            
-        Returns:
-            Tool result
-            
-        Raises:
-            ToolError: If all retry attempts fail
         """
         last_error = None
         
@@ -235,36 +241,36 @@ class KiteMCPClient:
                             print(f"❌ Rate limit error after {self.max_retries} retries: {e}")
                         raise ToolError(f"Rate limit exceeded after {self.max_retries} retries. Please try again later.")
                 
-                # Check if it's a connection error
-                elif any(word in error_msg for word in ["broken", "connection", "closed", "resource", "anyio"]):
+                # Check if it's a connection/protocol error
+                elif any(word in error_msg for word in ["broken", "connection", "closed", "resource", "anyio"]) or \
+                     type(e).__name__ in ["ClosedResourceError", "RemoteProtocolError", "EndOfStream", "ConnectionResetError"] or \
+                     isinstance(e, anyio.ClosedResourceError):
+                         
                     if attempt < self.max_retries:
                         wait_time = self.retry_delay * (2 ** attempt)
                         if not silent:
-                            print(f"⚠️ Connection error. Retrying in {wait_time:.1f}s... (attempt {attempt + 1}/{self.max_retries})")
+                            print(f"⚠️ Connection failure ({type(e).__name__}). Retrying in {wait_time:.1f}s... (attempt {attempt + 1}/{self.max_retries})")
                         
-                        # Try to reconnect
+                        # FORCE a complete teardown and re-initialization with fresh transport
                         try:
-                            await self.close()
-                            await self.connect()
-                        except Exception:
-                            pass
+                            await self.force_reconnect()
+                        except Exception as reconnect_err:
+                            if not silent:
+                                print(f"⚠️ Reconnection attempt failed: {reconnect_err}")
                         
                         await asyncio.sleep(wait_time)
                         continue
                     else:
                         if not silent:
-                            print(f"❌ Connection error after {self.max_retries} retries: {e}")
+                            print(f"❌ Connection failure after {self.max_retries} retries: {e}")
                         raise
                 
                 # For other errors, don't retry
                 else:
                     if not silent:
-                        import traceback
                         print(f"❌ Tool error call '{tool_name}': {type(e).__name__}: {e}")
-                        # logging.error(f"MCP tool error: {traceback.format_exc()}")
                     raise
         
-        # If we get here, all retries failed
         if last_error:
             raise last_error
 
@@ -273,10 +279,7 @@ class KiteMCPClient:
         Check if the current session is valid by calling a lightweight tool.
         """
         try:
-            # get_profile is a lightweight call to check session validity
             res = await self.call("get_profile", {}, silent=True)
-            # If it doesn't raise an exception, the session is likely valid
-            # Also check for specific error messages in the result content
             raw_text = self._collect_text_chunks(res)
             if "please log in" in raw_text.lower():
                 return False
@@ -284,9 +287,6 @@ class KiteMCPClient:
         except Exception:
             return False
 
-    # --------------------------
-    # Collect text chunks (needed for URL parsing)
-    # --------------------------
     @staticmethod
     def _collect_text_chunks(result: Any) -> str:
         texts = []
@@ -299,83 +299,22 @@ class KiteMCPClient:
                         texts.append(t)
         return "\n".join(texts).strip()
 
-    # --------------------------
-    # Flexible login URL extraction
-    # --------------------------
     @staticmethod
     def extract_login_url(login_result: Any) -> Optional[str]:
-
         # (1) From text content
         raw_text = KiteMCPClient._collect_text_chunks(login_result)
         if raw_text:
-            m = KITE_URL_REGEX.search(raw_text)
+            m = KITE_URL_REGEX.search(raw_text) or GENERIC_URL_REGEX.search(raw_text)
             if m:
                 return m.group(0)
 
-            m2 = GENERIC_URL_REGEX.search(raw_text)
-            if m2:
-                return m2.group(0)
-
-        # (2) Try JSON payloads (structured_content, data)
+        # (2) Try JSON payloads
         for attr in ("structured_content", "data"):
             payload = getattr(login_result, attr, None)
-            if not payload:
-                continue
-
+            if not payload: continue
             if isinstance(payload, dict):
                 for key in ("login_url", "url", "href"):
                     v = payload.get(key)
                     if isinstance(v, str) and v.startswith("http"):
                         return v
-
-                for v in payload.values():
-                    if isinstance(v, str):
-                        m = KITE_URL_REGEX.search(v) or GENERIC_URL_REGEX.search(v)
-                        if m:
-                            return m.group(0)
-
-            if isinstance(payload, list):
-                for item in payload:
-                    if isinstance(item, str):
-                        m = KITE_URL_REGEX.search(item) or GENERIC_URL_REGEX.search(item)
-                        if m:
-                            return m.group(0)
-                    if isinstance(item, dict):
-                        for v in item.values():
-                            if isinstance(v, str):
-                                m = KITE_URL_REGEX.search(v) or GENERIC_URL_REGEX.search(v)
-                                if m:
-                                    return m.group(0)
-
         return None
-
-    # --------------------------
-    # Login helper
-    # --------------------------
-    async def run_login_flow(self) -> str:
-        login_res = await self.call("login", {})
-        login_url = self.extract_login_url(login_res)
-
-        if not login_url:
-            raw = self._collect_text_chunks(login_res)
-            print("⚠️ Could not extract login URL.")
-            if raw:
-                print("MCP login output:")
-                print(raw)
-            raise RuntimeError("Could not extract login URL from MCP login tool.")
-
-        print(f"\n🔗 OPEN THIS LOGIN URL:\n{login_url}\n")
-        try:
-            webbrowser.open(login_url)
-        except Exception:
-            print("⚠️ Could not open browser automatically.")
-
-        input("⏳ Login in browser → then press ENTER here... ")
-
-        return login_url
-
-
-
-
-
-
