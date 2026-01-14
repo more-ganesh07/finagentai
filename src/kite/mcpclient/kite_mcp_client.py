@@ -236,7 +236,7 @@ class KiteMCPClient:
                         raise ToolError(f"Rate limit exceeded after {self.max_retries} retries. Please try again later.")
                 
                 # Check if it's a connection error
-                elif "broken" in error_msg or "connection" in error_msg:
+                elif any(word in error_msg for word in ["broken", "connection", "closed", "resource", "anyio"]):
                     if attempt < self.max_retries:
                         wait_time = self.retry_delay * (2 ** attempt)
                         if not silent:
